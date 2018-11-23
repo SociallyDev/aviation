@@ -1,0 +1,30 @@
+{
+  "name": "aviation",
+  "description": "URL routing inspired by express for the frontend!",
+  "version": "1.0.0",
+  "license": "MIT",
+  "main": "aviation.min.js",
+  "author": {
+    "name": "Dev Ang",
+    "url": "https://github.com/SociallyDev"
+  },
+  "homepage": "https://github.com/SociallyDev/aviation#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SociallyDev/aviation.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SociallyDev/aviation/issues"
+  },
+  "keywords": [
+    "framework",
+    "web",
+    "server",
+    "router",
+    "app",
+    "express",
+    "browser",
+    "website",
+    "javascript"
+  ]
+}
