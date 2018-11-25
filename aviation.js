@@ -131,6 +131,7 @@ function Aviation(options) {
       },
       html: function(content) {
         contentWrapper.html(content)
+        return this
       }
     }
     var next = function(e) {

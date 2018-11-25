@@ -72,7 +72,7 @@ Here's the result:
 This creates a new instance of Aviation with the supplied options.
 Possible options are:
 + contentWrapper (String) This is the element res.html() will update with content. Defaults to `body`.
-+ onError (Function) This is the function that will be called when an error occurs. Defauls to `console.error`.
++ onError (Function) This is the function that will be called when an error occurs. Defaults to `console.error`.
 + caseSensitive - (Boolean) Should /app and /App not be considered the same? Defaults to false.
 + strict - (Boolean) Should /app and /app/ not be considered the same? Defaults to false.
 + removeFromPath - (String or Regex) Removes the string or matching regex from all paths. Useful for running local projects, or anything inside a directory.
