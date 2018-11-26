@@ -33,19 +33,20 @@ function Aviation(options) {
     if(!(path instanceof RegExp)) {
       if(path.constructor == Array || path.constructor == Object) { for(var i in path) { aviation.use(path[i], callback) }; return aviation }
       else { path = String(path) }
+      var flags = ""
 
       path = $("<a href='" + path + "'></a>").get(0).pathname
       if(!options.strict) { path = path.replace(/\/$/, "") }
-      if(!options.caseSensitive) { path = path.toLowerCase() }
-      if(options.removeFromPath) { path = path.replace((options.caseSensitive || typeof options.removeFromPath !== "string"  ? options.removeFromPath : options.removeFromPath.toLowerCase()), "") }
+      if(!options.caseSensitive) { flags = "i" }
+      if(options.removeFromPath) { path = path.replace(options.removeFromPath, "") }
 
       //Handle params.
       if(/\:/.test(path)) {
         path = path.replace(/\*+/g, "").replace(/:([^\/]+)/g, function(a, key) { keys.push(key); return "([^\\/]+?)" })
-        path = new RegExp("^" + path.split("([^\\/]+?)").map(function(p) { return p.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&") }).join("([^\\/]+?)") + "$")
+        path = new RegExp("^" + path.split("([^\\/]+?)").map(function(p) { return p.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&") }).join("([^\\/]+?)") + "$", flags)
       }
       else {
-        path = new RegExp("^" + path.split(/\*+/).map(function(p) { return p.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&") }).join(".*") + "$")
+        path = new RegExp("^" + path.split(/\*+/).map(function(p) { return p.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&") }).join(".*") + "$", flags)
       }
     }
 
@@ -68,8 +69,7 @@ function Aviation(options) {
     var el = $("<a href=" + exactURL + "></a>").get(0), path = el.pathname
 
     if(!options.strict) { path = path.replace(/\/$/, "") }
-    if(!options.caseSensitive) { path = path.toLowerCase() }
-    if(options.removeFromPath) { path = path.replace((options.caseSensitive ? options.removeFromPath : options.removeFromPath.toLowerCase()), "") }
+    if(options.removeFromPath) { path = path.replace(options.removeFromPath, "") }
 
     //Create a list of viable callbacks.
     var viableCbs = []
