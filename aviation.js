@@ -12,6 +12,15 @@ MIT License ( https://opensource.org/licenses/MIT )
 if(typeof $ == "undefined") { throw new Error("Aviation requires jQuery for now.") }
 
 
+
+
+
+/********************************************* PRIMARY FUNCTION **********************************************/
+
+
+/*
+The Aviation class.
+*/
 function Aviation(options) {
   if(!(this instanceof Aviation)) { return new Aviation(options) }
   if(typeof options !== "object") { options = {strict: false, caseSensitive: false} }
@@ -196,4 +205,30 @@ function Aviation(options) {
     return cookies
   }
 
+}
+
+
+
+
+
+/********************************************* BUILDER FUNCTIONS **********************************************/
+
+
+/*
+Writing HTML as strings in JS is hard.
+So just write pure HTML, JSX helps you with that.
+And this function, when set as the pragma for JSX instead of React.createElement,
+turns that JSX into safe JS that can be used on any browser.
+Returns a jQuery element.
+*/
+Aviation.element = function() {
+  var children = arguments, type = "div", props = false
+  if(children[0] && typeof children[0] == "string") { type = children[0]; delete children[0] }
+  if(children[1] && typeof children[1] == "object") { props = children[1]; delete children[1] }
+
+  var el = $("<" + type + ">")
+  if(props) { el.attr(props) }
+  for(var i in children) { el.append(children[i]) }
+
+  return el
 }

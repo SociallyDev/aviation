@@ -181,3 +181,33 @@ app.use(function(req, res, next) {
 })
 
 ```
+
+
+<br />
+
+
+## Aviation.element(type, [props], ...children)
+Writing HTML as strings in JS is hard. So just write pure HTML, JSX helps you with that. And this function, when set as the pragma for JSX instead of React.createElement, turns that JSX into safe JS that can be used on any browser.
+Returns a jQuery element.
+
+
+#### Using Aviation.element through JSX via Babel:
+
+```javascript
+const jsxCode = 'var el = <div></div>; console.log(el)' //OR: fs.readFileSync("./app.jsx")
+const babel = require("@babel/core")
+
+var result = babel.transformSync(jsxCode, {presets: [["@babel/preset-react", {pragma: "Aviation.element"}]]})
+
+//JS: result.code
+```
+
+
+#### Using Aviation.element directly:
+
+```javascript
+var el = Aviation.element("div", {class: "test-div"}, "text inside div")
+
+console.log(el)
+```
+
