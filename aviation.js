@@ -3,29 +3,28 @@ URL routing for frontend apps!
 + Inspired by express.
 
 
-Written by Dev Ang ( https://github.com/SociallyDev ) on 23rd November 2018.
-
+Written by Devang Srivastava ( https://github.com/SociallyDev )
 
 MIT License ( https://opensource.org/licenses/MIT )
-
 */
 
 
 if(typeof $ == "undefined") { throw new Error("Aviation requires jQuery for now.") }
 
 
-
 function Aviation(options) {
   if(!(this instanceof Aviation)) { return new Aviation(options) }
   if(typeof options !== "object") { options = {strict: false, caseSensitive: false} }
-  var callbacks = [], aviation = this, contentWrapper = $(options.contentWrapper || "body"), onError = options.onError || console.error
+  var callbacks = [], aviation = this, contentWrapper = $(options.contentWrapper || "body"), onError = options.onError || function(e) { console.error(e) }
 
+
+  /******************************************** ROUTING FUNCTIONS **********************************************/
 
 
   /*
   Adds callbacks.
   */
-  this.use = function(match, callback) {
+  this.on = function(match, callback) {
     var path = match, fn = callback, keys = []
     if(!callback) { fn = match, path = /^.*$/ }
 
@@ -50,14 +49,16 @@ function Aviation(options) {
       }
     }
 
+    //Add to list of callbacks.
     callbacks.push({
       path: path,
       keys: keys,
       fn: fn
     })
+
     return aviation
   }
-  this.on = this.use
+  this.use = this.on
 
 
 
@@ -88,7 +89,7 @@ function Aviation(options) {
     var request = {
       url: el.href,
       hostname: el.hostname,
-      pathname: path,
+      pathname: path || "/",
       protocol: (el.protocol ? el.protocol.replace(":", "") : null),
       secure: false,
       query: parseQuery(el.href),
@@ -97,6 +98,7 @@ function Aviation(options) {
       aviation: aviation
     }
     if(request.protocol == "https") { request.secure = true }
+
     var response = {
       cookie: function(key, val, options) {
         if(!options) { options = {} }
@@ -111,29 +113,35 @@ function Aviation(options) {
         + (options.sameSite ? ";samesite=" + encodeURIComponent(options.sameSite) : "")
         return this
       },
+
       clearCookie: function(key, options) {
         options.maxAge = -1
         this.cookie(key, null, options)
         delete request.cookies[key]
         return this
       },
+
       location: function(url) {
         var redirect = true
         aviation.handle({href: url, preventDefault: function() { redirect = false }})
         if(redirect) { window.location = url }
         return this
       },
+
       redirect: function(url) { return this.location(url) },
+
       page: function(title, url) {
         if(typeof history !== "undefined" && history.pushState) { history.pushState({}, title, url || request.url) }
         $("title").text(title)
         return this
       },
+
       html: function(content) {
         contentWrapper.html(content)
         return this
       }
     }
+
     var next = function(e) {
       try {
         if(e) { throw e }
@@ -141,9 +149,10 @@ function Aviation(options) {
         var cb = viableCbs[i]
         if(!cb) { return }
         request.params = cb.params
-        cb.fn(request, response, next)
+        var result = cb.fn(request, response, next)
+        if(result.catch) { result.catch(function(e) { onError(e, request, response, next) }) }
       }
-      catch(e) { onError(e) }
+      catch(e) { onError(e, request, response, next) }
     }, i = -1
 
     //Start request.
@@ -153,11 +162,17 @@ function Aviation(options) {
   }
 
 
+
   //Setup calls.
-  $(document).ready(function() { aviation.handle(window.location) })
-  $(document).on(options.event || "click", options.source || "a:not([target='_blank'])", aviation.handle)
+  if(!options.cancelLoadRouting) { $(document).ready(function() { aviation.handle(window.location) }) }
+  $(document).on(options.event || "click", options.source || "a[href]:not([target='_blank'])", aviation.handle)
   window.addEventListener("popstate", function(e) { aviation.handle(window.location.href) }, false)
 
+
+
+
+
+  /********************************************* HELPER FUNCTIONS **********************************************/
 
 
   /*

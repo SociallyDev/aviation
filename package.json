@@ -1,11 +1,11 @@
 {
   "name": "aviation",
   "description": "URL routing inspired by express for the frontend!",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "license": "MIT",
   "main": "aviation.min.js",
   "author": {
-    "name": "Dev Ang",
+    "name": "Devang Srivastava",
     "url": "https://github.com/SociallyDev"
   },
   "homepage": "https://github.com/SociallyDev/aviation#readme",
