@@ -1,6 +1,8 @@
 
 <img src="https://i.imgur.com/f92HlAo.png" width="100%">
 
+[![](https://data.jsdelivr.com/v1/package/npm/aviation/badge)](https://www.jsdelivr.com/package/npm/aviation)
+
 
 ### URL routing inspired by express for the frontend!
 
@@ -210,4 +212,3 @@ var el = Aviation.element("div", {class: "test-div"}, "text inside div")
 
 console.log(el)
 ```
-
