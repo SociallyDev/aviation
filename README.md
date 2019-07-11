@@ -134,7 +134,7 @@ function myCallback(request, response, next) {
 ### Request
 + url - This is the URL of the request.
 + hostname - This is the hostname (domain) of the request.
-+ pathname - This is the path of the request, like /app.
++ path - This is the path of the request, like /app.
 + protocol - This is the protocol of the request.
 + secure - Boolean, whether the request is over HTTPS.
 + query - Key-value object, this is the parsed query string of the URL.
@@ -160,7 +160,7 @@ function myCallback(request, response, next) {
 
 <br />
 
-+ **html(content)** - Essentially a wrapper for jQuery's .html(). Updates the content of the page.
++ **html(content)** - Essentially a wrapper for jQuery's .html(). Updates the content of the page. It can also accept a reference or element created directly by jQuery like res.html($('<div></div>').text("Example!"))
 
 
 <br />

@@ -95,10 +95,11 @@ function Aviation(options) {
 
     //Create request, response and next functions.
     if(url.preventDefault) { url.preventDefault() }
+    if(!path || path[0] !== "/") { path = "/" + (path || "") }
     var request = {
       url: el.href,
       hostname: el.hostname,
-      pathname: path || "/",
+      path: path,
       protocol: (el.protocol ? el.protocol.replace(":", "") : null),
       secure: false,
       query: parseQuery(el.href),
@@ -106,6 +107,7 @@ function Aviation(options) {
       cookies: parseCookies(),
       aviation: aviation
     }
+    request.__proto__.pathname = path
     if(request.protocol == "https") { request.secure = true }
 
     var response = {
@@ -146,6 +148,7 @@ function Aviation(options) {
       },
 
       html: function(content) {
+        if(content && content[0] && content[0].outerHTML) { content = content[0].outerHTML }
         contentWrapper.html(content)
         return this
       }
@@ -159,7 +162,7 @@ function Aviation(options) {
         if(!cb) { return }
         request.params = cb.params
         var result = cb.fn(request, response, next)
-        if(result.catch) { result.catch(function(e) { onError(e, request, response, next) }) }
+        if(result && result.catch) { result.catch(function(e) { onError(e, request, response, next) }) }
       }
       catch(e) { onError(e, request, response, next) }
     }, i = -1
