@@ -148,7 +148,6 @@ function Aviation(options) {
       },
 
       html: function(content) {
-        if(content && content[0] && content[0].outerHTML) { content = content[0].outerHTML }
         contentWrapper.html(content)
         return this
       }
@@ -230,8 +229,40 @@ Aviation.element = function() {
   if(children[1] && typeof children[1] == "object") { props = children[1]; delete children[1] }
 
   var el = $("<" + type + ">")
-  if(props) { el.attr(props) }
-  for(var i in children) { el.append(children[i]) }
+  if(props) {
+    if(props.className) { props.class = props.className; delete props.className }
+    if(props.style && props.style.constructor == Object) { el.css(props.style); delete props.style }
+    el.attr(props)
+  }
+  for(var i in children) {
+    if(!children[i] || !children[i].isAviationElement) { children[i] = Aviation.safe(children[i]) }
+    el.append(children[i])
+  }
 
+  el.isAviationElement = true
   return el
 }
+
+
+
+/*
+Escapes text for safe usage.
+*/
+Aviation.safe = function(text) {
+  if(!text) { return "" }
+  text = String(text).replace(/\&/gi, "&amp;").replace(/\</gi, "&lt;").replace(/\>/gi, "&gt;").replace(/\"/gi, "&quot;").replace(/\'/gi, "&#x27;").replace(/\//gi, "&#x2F;")
+  return text
+}
+
+
+
+/*
+Creates a function to help with getting the outer HTML.
+*/
+$.fn.extend({
+  outerHTML: function() {
+    var html = ""
+    this.each(function() { html += this.outerHTML })
+    return html
+  }
+})

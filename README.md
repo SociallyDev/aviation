@@ -212,3 +212,8 @@ var el = Aviation.element("div", {class: "test-div"}, "text inside div")
 
 console.log(el)
 ```
+
+<br />
+
+## Aviation.safe(text)
+Converts anything into safe to use text with escaped HTML characters.
