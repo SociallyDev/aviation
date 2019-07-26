@@ -85,7 +85,7 @@ function Aviation(options) {
     var viableCbs = []
     for(var i in callbacks) {
       var cb = callbacks[i]
-      if(cb.path.test(path)) {
+      if(cb.path && cb.path.test(path)) {
         var params = {}, vals = path.match(cb.path).slice(1)
         if(cb.keys.length) { for(var i in vals) { params[cb.keys[i]] = vals[i] } }
         viableCbs.push({fn: cb.fn, params: params})
@@ -107,7 +107,6 @@ function Aviation(options) {
       cookies: parseCookies(),
       aviation: aviation
     }
-    request.__proto__.pathname = path
     if(request.protocol == "https") { request.secure = true }
 
     var response = {
