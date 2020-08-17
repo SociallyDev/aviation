@@ -9,12 +9,6 @@ MIT License ( https://opensource.org/licenses/MIT )
 */
 
 
-if(typeof $ == "undefined") { throw new Error("Aviation requires jQuery for now.") }
-
-
-
-
-
 /********************************************* PRIMARY FUNCTION **********************************************/
 
 
@@ -24,7 +18,7 @@ The Aviation class.
 function Aviation(options) {
   if(!(this instanceof Aviation)) { return new Aviation(options) }
   if(typeof options !== "object") { options = {strict: false, caseSensitive: false} }
-  var callbacks = [], aviation = this, contentWrapper = $(options.contentWrapper || "body"), onError = options.onError || function(e) { console.error(e) }
+  var callbacks = [], aviation = this, contentWrapper = document.querySelector(options.contentWrapper || "body"), onError = options.onError || function(e) { console.error(e) }
 
 
   /******************************************** ROUTING FUNCTIONS **********************************************/
@@ -35,6 +29,7 @@ function Aviation(options) {
   */
   this.on = function(match, callback) {
     var path = match, fn = callback, keys = []
+    if(path == "*") { path = /^.*$/ }
     if(!callback) { fn = match, path = /^.*$/ }
 
     //Convert path to regex.
@@ -43,7 +38,9 @@ function Aviation(options) {
       else { path = String(path) }
       var flags = ""
 
-      path = $("<a href='" + path + "'></a>").get(0).pathname
+      var a = document.createElement("a")
+      a.href = path
+      path = a.pathname
       if(!options.strict) { path = path.replace(/\/$/, "") }
       if(!options.caseSensitive) { flags = "i" }
       if(options.removeFromPath) { path = path.replace(options.removeFromPath, "") }
@@ -74,10 +71,14 @@ function Aviation(options) {
   /*
   Handles requests.
   */
-  this.handle = function(url) {
-    var exactURL = (typeof url == "string" ? url : (typeof url !== "object" ? "/" : (url.href ? url.href : (this.href ? this.href : (this.action ? this.action : "/")))))
-    var el = $("<a href=" + exactURL + "></a>").get(0), path = el.pathname
+  this.handle = function(e, skipPushingHistory) {
+    //Get the URL & convert it to a link element.
+    var url = typeof e == "string" ? e : (e.target ? e.target.getAttribute("href") : (e.href ? e.href : (this.href ? this.href : (this.action ? this.action : "/"))))
+    var a = document.createElement("a")
+    a.href = url
+    var path = a.pathname
 
+    //Handle any filtering.
     if(!options.strict) { path = path.replace(/\/$/, "") }
     if(options.removeFromPath) { path = path.replace(options.removeFromPath, "") }
 
@@ -94,15 +95,15 @@ function Aviation(options) {
     if(!viableCbs.length) { return aviation }
 
     //Create request, response and next functions.
-    if(url.preventDefault) { url.preventDefault() }
+    if(e.preventDefault) { e.preventDefault() }
     if(!path || path[0] !== "/") { path = "/" + (path || "") }
     var request = {
-      url: el.href,
-      hostname: el.hostname,
+      url: a.href,
+      hostname: a.hostname,
       path: path,
-      protocol: (el.protocol ? el.protocol.replace(":", "") : null),
+      protocol: (a.protocol ? a.protocol.replace(":", "") : null),
       secure: false,
-      query: parseQuery(el.href),
+      query: parseQuery(a.href),
       params: {},
       cookies: parseCookies(),
       aviation: aviation
@@ -141,13 +142,13 @@ function Aviation(options) {
       redirect: function(url) { return this.location(url) },
 
       page: function(title, url) {
-        if(typeof history !== "undefined" && history.pushState) { history.pushState({}, title, url || request.url) }
-        $("title").text(title)
+        if(typeof history !== "undefined" && history.pushState && options.changeURL !== false && skipPushingHistory !== true) { history.pushState({url: url || request.url}, title, url || request.url) }
+        document.querySelector("title").innerText = title
         return this
       },
 
       html: function(content) {
-        contentWrapper.html(content)
+        contentWrapper.innerHTML = content
         return this
       }
     }
@@ -174,9 +175,12 @@ function Aviation(options) {
 
 
   //Setup calls.
-  if(!options.cancelLoadRouting) { $(document).ready(function() { aviation.handle(window.location) }) }
-  $(document).on(options.event || "click", options.source || "a[href]:not([target='_blank'])", aviation.handle)
-  window.addEventListener("popstate", function(e) { aviation.handle(window.location.href) }, false)
+  if(options.skipOnLoad !== true) { document.addEventListener(options.loadEvent || "DOMContentLoaded", function() { aviation.handle(window.location) }) }
+  (options.eventWrapper || document).addEventListener(options.event || "click", function(e) {
+    if(!e.target.matches(options.source || "a[href]:not([target='_blank'])")) { return }
+    aviation.handle(e)
+  })
+  if(options.skipPopstate !== true && options.changeURL !== false) { window.addEventListener("popstate", function(e) { aviation.handle(e.state.url, true) }, false) }
 
 
 
@@ -220,24 +224,32 @@ Writing HTML as strings in JS is hard.
 So just write pure HTML, JSX helps you with that.
 And this function, when set as the pragma for JSX instead of React.createElement,
 turns that JSX into safe JS that can be used on any browser.
-Returns a jQuery element.
 */
 Aviation.element = function() {
+  //Get the type & props.
   var children = arguments, type = "div", props = false
   if(children[0] && typeof children[0] == "string") { type = children[0]; delete children[0] }
   if(children[1] && typeof children[1] == "object") { props = children[1]; delete children[1] }
 
-  var el = $("<" + type + ">")
+  //Make this element.
+  var el = document.createElement(type)
   if(props) {
+    //Add properties.
     if(props.className) { props.class = props.className; delete props.className }
-    if(props.style && props.style.constructor == Object) { el.css(props.style); delete props.style }
-    el.attr(props)
+    if(props.style && props.style.constructor == Object) {
+      for(var name in props.style) { el.style[name] = props.style[name] }
+      delete props.style
+    }
+    for(var name in props) { el.setAttribute(name, props[name]) }
   }
+
+  //Add children inside this element.
   for(var i in children) {
     if(!children[i] || !children[i].isAviationElement) { children[i] = Aviation.safe(children[i]) }
     el.append(children[i])
   }
 
+  //Mark this element as an Aviation element to stop Aviation from converting this to text if it's a child.
   el.isAviationElement = true
   return el
 }
@@ -252,16 +264,3 @@ Aviation.safe = function(text) {
   text = String(text).replace(/\&/gi, "&amp;").replace(/\</gi, "&lt;").replace(/\>/gi, "&gt;").replace(/\"/gi, "&quot;").replace(/\'/gi, "&#x27;").replace(/\//gi, "&#x2F;")
   return text
 }
-
-
-
-/*
-Creates a function to help with getting the outer HTML.
-*/
-$.fn.extend({
-  outerHTML: function() {
-    var html = ""
-    this.each(function() { html += this.outerHTML })
-    return html
-  }
-})

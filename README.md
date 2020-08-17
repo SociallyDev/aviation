@@ -73,13 +73,18 @@ Here's the result:
 
 This creates a new instance of Aviation with the supplied options.
 Possible options are:
-+ contentWrapper (String) This is the element res.html() will update with content. Defaults to `body`.
++ contentWrapper - This is the element res.html() will update with content. Defaults to `body`.
 + onError (Function) This is the function that will be called when an error occurs. It's provided with the err, req, res, next arguments. Defaults to `console.error`.
 + caseSensitive - (Boolean) Should /app and /App not be considered the same? Defaults to false.
 + strict - (Boolean) Should /app and /app/ not be considered the same? Defaults to false.
 + removeFromPath - (String or Regex) Removes the string or matching regex from all paths. Useful for running local projects, or anything inside a directory.
 + event - (String) The event type to listen for. Defaults to `click`.
 + source - (String) The source types to listen for. Defaults to `a[href]:not([target='_blank'])`.
++ eventWrapper - The element that we listen to all events for. Defaults to `document`.
++ changeURL - (Boolean) Whether the browser URL should be changed? Set this to false for Cordova/Electron & other file:// uses. Defaults to true.
++ skipOnLoad - (Boolean) Should Aviation skip handling the URL on page load?
++ loadEvent - (String) The event that Aviation listens for when the page is being loaded (Doesn't matter if you `skipOnLoad`). The default is `DOMContentLoaded`. You can also set this to `deviceready` for Cordova.
++ skipPopstate - (Boolean) Should Aviation skip listening to the browser for backward & forward buttons? Defaults to false.
 
 
  Returns the `.use() `and `.handle()` functions.
