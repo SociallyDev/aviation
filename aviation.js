@@ -71,9 +71,10 @@ function Aviation(options) {
   /*
   Handles requests.
   */
-  this.handle = function(e, skipPushingHistory) {
+  this.handle = function(e, skipPushingHistory, realTarget) {
     //Get the URL & convert it to a link element.
-    var url = typeof e == "string" ? e : (e.target ? e.target.getAttribute("href") : (e.href ? e.href : (this.href ? this.href : (this.action ? this.action : "/"))))
+    if(!realTarget) { realTarget = e.target }
+    var url = typeof e == "string" ? e : (realTarget ? realTarget.getAttribute("href") : (e.href ? e.href : (this.href ? this.href : "")))
     var a = document.createElement("a")
     a.href = url
     var path = a.pathname
@@ -177,8 +178,15 @@ function Aviation(options) {
   //Setup calls.
   if(options.skipOnLoad !== true) { document.addEventListener(options.loadEvent || "DOMContentLoaded", function() { aviation.handle(window.location) }) }
   (options.eventWrapper || document).addEventListener(options.event || "click", function(e) {
-    if(!e.target.matches(options.source || "a[href]:not([target='_blank'])")) { return }
-    aviation.handle(e)
+    var matched = false
+    for(var i in e.path) {
+      if(e.path[i].matches(options.source || "a[href]:not([target='_blank'])")) {
+        matched = e.path[i]
+        break
+      }
+    }
+    if(!matched) { return }
+    aviation.handle(e, false, matched)
   })
   if(options.skipPopstate !== true && options.changeURL !== false) { window.addEventListener("popstate", function(e) { aviation.handle(e.state.url, true) }, false) }
 
