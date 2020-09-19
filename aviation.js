@@ -253,7 +253,7 @@ Aviation.element = function() {
 
   //Add children inside this element.
   for(var i in children) {
-    if(!children[i] || !children[i].isAviationElement) { children[i] = Aviation.safe(children[i]) }
+    if(!children[i] || !children[i].isAviationElement) { children[i] = String(children[i]) }
     el.append(children[i])
   }
 
