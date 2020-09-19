@@ -1,7 +1,7 @@
 {
   "name": "aviation",
   "description": "URL routing inspired by express for the frontend!",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "license": "MIT",
   "main": "aviation.min.js",
   "author": {
