@@ -149,7 +149,8 @@ function Aviation(options) {
       },
 
       html: function(content) {
-        contentWrapper.innerHTML = content
+        contentWrapper.innerHTML = ''
+        contentWrapper.append(content)
         return this
       }
     }
@@ -180,7 +181,7 @@ function Aviation(options) {
   (options.eventWrapper || document).addEventListener(options.event || "click", function(e) {
     var matched = false
     for(var i in e.path) {
-      if(e.path[i].matches(options.source || "a[href]:not([target='_blank'])")) {
+      if(e.path[i] && e.path[i].matches && e.path[i].matches(options.source || "a[href]:not([target='_blank'])")) {
         matched = e.path[i]
         break
       }
