@@ -249,7 +249,10 @@ Aviation.element = function() {
       for(var name in props.style) { el.style[name] = props.style[name] }
       delete props.style
     }
-    for(var name in props) { el.setAttribute(name, props[name]) }
+    for(var name in props) {
+      if(props[name] === false) { continue }
+      el.setAttribute(name, props[name])
+    }
   }
 
   //Add children inside this element.
