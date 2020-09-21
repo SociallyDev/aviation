@@ -250,7 +250,7 @@ Aviation.element = function() {
       delete props.style
     }
     for(var name in props) {
-      if(props[name] === false) { continue }
+      if(!props[name]) { continue }
       el.setAttribute(name, props[name])
     }
   }
