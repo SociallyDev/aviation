@@ -78,7 +78,7 @@ Possible options are:
 + caseSensitive - (Boolean) Should /app and /App not be considered the same? Defaults to false.
 + strict - (Boolean) Should /app and /app/ not be considered the same? Defaults to false.
 + removeFromPath - (String or Regex) Removes the string or matching regex from all paths. Useful for running local projects, or anything inside a directory.
-+ event - (String) The event type to listen for. Defaults to `click`.
++ events - (Array of strings) The event type sto listen for. Defaults to `["click", "touchstart"]`.
 + source - (String) The source types to listen for. Defaults to `a[href]:not([target='_blank'])`.
 + eventWrapper - The element that we listen to all events for. Defaults to `document`.
 + changeURL - (Boolean) Whether the browser URL should be changed? Set this to false for Cordova/Electron & other file:// uses. Defaults to true.

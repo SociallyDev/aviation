@@ -178,17 +178,21 @@ function Aviation(options) {
 
   //Setup calls.
   if(options.skipOnLoad !== true) { document.addEventListener(options.loadEvent || "DOMContentLoaded", function() { aviation.handle(window.location) }) }
-  (options.eventWrapper || document).addEventListener(options.event || "click", function(e) {
-    var matched = false
-    for(var i in e.path) {
-      if(e.path[i] && e.path[i].matches && e.path[i].matches(options.source || "a[href]:not([target='_blank'])")) {
-        matched = e.path[i]
+  this.eventHandler = function(e) {
+    var matched = false, path = e.path
+    if(!path) { path = [e.target] }
+    for(var i in path) {
+      if(path[i] && path[i].matches && path[i].matches(options.source || "a[href]:not([target='_blank'])")) {
+        matched = path[i]
         break
       }
     }
     if(!matched) { return }
     aviation.handle(e, false, matched)
-  })
+  }
+  if(!options.events || !options.events.length) { options.events = ["click", "touchstart"] }
+  for(var i in options.events) { (options.eventWrapper || document).addEventListener(options.events[i], this.eventHandler) }
+
   if(options.skipPopstate !== true && options.changeURL !== false) { window.addEventListener("popstate", function(e) { aviation.handle(e.state.url, true) }, false) }
 
 
