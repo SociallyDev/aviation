@@ -196,9 +196,9 @@ function Aviation(options) {
 
     //Try matching the path if one exists.
     if(e.path) {
-      for(var i in path) {
-        if(path[i] && path[i].matches && path[i].matches(query)) {
-          matched = path[i]
+      for(var i in e.path) {
+        if(e.path[i] && e.path[i].matches && e.path[i].matches(query)) {
+          matched = e.path[i]
           break
         }
       }
