@@ -176,23 +176,53 @@ function Aviation(options) {
 
 
 
-  //Setup calls.
-  if(options.skipOnLoad !== true) { document.addEventListener(options.loadEvent || "DOMContentLoaded", function() { aviation.handle(window.location) }) }
+  //Handles on load activities.
+  this.loadListener = function() {
+    var location = window.location.href
+    if(location.substring(0, 7) == "file://") {
+      if(typeof options.changeURL == "undefined") { options.changeURL = false }
+      location = "/"
+    }
+    aviation.handle(location)
+  }
+  if(options.skipOnLoad !== true) {
+    if(!options.loadEvents || !options.loadEvents.length) { options.loadEvents = ["DOMContentLoaded"] }
+    for(var i in options.loadEvents) { document.addEventListener(options.loadEvents[i], this.loadListener) }
+  }
+
+  //Setup events.
   this.eventHandler = function(e) {
-    var matched = false, path = e.path
-    if(!path) { path = [e.target] }
-    for(var i in path) {
-      if(path[i] && path[i].matches && path[i].matches(options.source || "a[href]:not([target='_blank'])")) {
-        matched = path[i]
-        break
+    var matched = false, query = options.source || "a[href]:not([target='_blank']):not(.skip-aviation)"
+
+    //Try matching the path if one exists.
+    if(e.path) {
+      for(var i in path) {
+        if(path[i] && path[i].matches && path[i].matches(query)) {
+          matched = path[i]
+          break
+        }
       }
     }
+
+    //Otherwise try matching target.
+    if(!matched && e.target) {
+      if(e.target.matches(query)) { matched = e.target }
+      if(!matched && e.target.parentNode) {
+        var parent = e.target.parentNode
+        while(parent) {
+          if(parent.matches && parent.matches(query)) { matched = parent; break }
+          parent = parent.parentNode
+        }
+      }
+    }
+
     if(!matched) { return }
     aviation.handle(e, false, matched)
   }
-  if(!options.events || !options.events.length) { options.events = ["click", "touchstart"] }
+  if(!options.events || !options.events.length) { options.events = ["click"] }
   for(var i in options.events) { (options.eventWrapper || document).addEventListener(options.events[i], this.eventHandler) }
 
+  //Handle browser history events.
   if(options.skipPopstate !== true && options.changeURL !== false) { window.addEventListener("popstate", function(e) { aviation.handle(e.state.url, true) }, false) }
 
 

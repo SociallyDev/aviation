@@ -78,12 +78,12 @@ Possible options are:
 + caseSensitive - (Boolean) Should /app and /App not be considered the same? Defaults to false.
 + strict - (Boolean) Should /app and /app/ not be considered the same? Defaults to false.
 + removeFromPath - (String or Regex) Removes the string or matching regex from all paths. Useful for running local projects, or anything inside a directory.
-+ events - (Array of strings) The event type sto listen for. Defaults to `["click", "touchstart"]`.
-+ source - (String) The source types to listen for. Defaults to `a[href]:not([target='_blank'])`.
++ events - (Array of strings) The events to listen for. Defaults to `["click"]`.
++ source - (String) The source types to listen for. Defaults to `a[href]:not([target='_blank']):not(.skip-aviation)`.
 + eventWrapper - The element that we listen to all events for. Defaults to `document`.
-+ changeURL - (Boolean) Whether the browser URL should be changed? Set this to false for Cordova/Electron & other file:// uses. Defaults to true.
++ changeURL - (Boolean) Whether the browser URL should be changed? This automatically sets itself to false if the web app was launched in a containerized state (file://). If the web app starts with in any other context (eg https:// for web), this defaults to false. Helps deal with Cordova & Electron.
 + skipOnLoad - (Boolean) Should Aviation skip handling the URL on page load?
-+ loadEvent - (String) The event that Aviation listens for when the page is being loaded (Doesn't matter if you `skipOnLoad`). The default is `DOMContentLoaded`. You can also set this to `deviceready` for Cordova.
++ loadEvents - (Array of strings) The event that Aviation listens for when the page is being loaded (This doesn't do anything if `skipOnLoad` is set to true). The default is `["DOMContentLoaded"]`. You can also set this to `["deviceready"]` for Cordova (Although Cordova also fires the DOMContentLoaded event, so this is only if you want to use the Cordova plugins as soon as Aviation sends a request).
 + skipPopstate - (Boolean) Should Aviation skip listening to the browser for backward & forward buttons? Defaults to false.
 
 
