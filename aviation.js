@@ -292,8 +292,12 @@ Aviation.element = function() {
   //Add children inside this element.
   for(var i in children) {
     if(!children[i]) { continue }
-    if(!children[i].isAviationElement) { children[i] = String(children[i]) }
-    el.append(children[i])
+    var toAdd = children[i]
+    if(!Array.isArray(toAdd)) { toAdd = [toAdd] }
+    for(var x in toAdd) {
+      if(!toAdd[x].isAviationElement) { toAdd[x] = String(toAdd[x]) }
+      el.append(toAdd[x])
+    }
   }
 
   //Mark this element as an Aviation element to stop Aviation from converting this to text if it's a child.
