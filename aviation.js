@@ -223,7 +223,12 @@ function Aviation(options) {
   for(var i in options.events) { (options.eventWrapper || document).addEventListener(options.events[i], this.eventHandler) }
 
   //Handle browser history events.
-  if(options.skipPopstate !== true && options.changeURL !== false) { window.addEventListener("popstate", function(e) { aviation.handle(e.state.url, true) }, false) }
+  if(options.skipPopstate !== true && options.changeURL !== false) {
+    window.addEventListener("popstate", function(e) {
+      if(!e.state || !e.state.url) { return }
+      aviation.handle(e.state.url, true)
+    }, false)
+  }
 
 
 
